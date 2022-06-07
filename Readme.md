@@ -1,3 +1,8 @@
+# Личный проект «Что посмотреть»
+
+* Студент: [Антон Романов](https://up.htmlacademy.ru/yii/2/user/918779).
+* Наставник: [Вадим Занфир](https://htmlacademy.ru/profile/id2123177).
+
 # Руководство по работе с проектом
 
 Данный проект создан с помощью [Create React App](https://github.com/facebook/create-react-app).
