@@ -1,14 +1,22 @@
 <?php
 
+use whatwatch\UserLogger;
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
+use GuzzleHttp\Client;
+
 use whatwatch\OmdbRepository;
 use whatwatch\GetMovies;
 
 require_once '../vendor/autoload.php';
 
-$moviesRepository = new OmdbRepository('tt3896198');
-$getMoviesDb = new GetMovies();
-$movie = $getMoviesDb->getMoviesList($moviesRepository);
+$logger = new Logger('omdb');
+$logger->pushHandler(new StreamHandler('file.log'));
 
-echo "<pre>";
-print_r($movie);
-echo "</pre>";
+$client = new OmdbRepository($logger, new Client(['base_uri' => 'http://www.omdbapi.com', 'http_errors' => false]), '579fed43');
+
+$movie = $client->getMovie('tt3896198');
+    
+    echo "<pre>";
+    print_r($movie);
+    echo "</pre>";

@@ -1,8 +1,8 @@
-<?
+<?php
 
 namespace whatwatch;
 
 interface RemoteRepository
 {
-    public function getMovies(): array;
+    public function getMovie(string $movieId): array;
 }

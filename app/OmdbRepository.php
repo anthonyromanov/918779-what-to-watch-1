@@ -2,24 +2,41 @@
 
 namespace whatwatch;
 
-use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
+use Psr\Log\LoggerInterface;
 
 class OmdbRepository implements RemoteRepository
 {
-    private string $apiKey = '579fed43';
-    private string $movieId;
 
-    public function __construct(string $movieId)
+    private ClientInterface $client;
+    private LoggerInterface $logger;
+
+    private string $apikey;      
+
+    public function __construct(LoggerInterface $logger, ClientInterface $client, string $apikey)
     {
-        $this->movieId = $movieId;
+        
+        $this->apikey = $apikey;
+        $this->client = $client;
+        $this->logger = $logger;
+
     }
 
-
-    public function getMovies(): array
+    public function getMovie(string $movieId): array
     {
-        $client = new Client(['base_uri' => 'http://www.omdbapi.com/']);
-        $response = $client->request('GET', '?i=' . $this->movieId . '&apikey=' . $this->apiKey);
+        $this->logger->info('Trying to search movie by id "{movieId}"', ['movieId' => $movieId]);
+        
+        $data = [
+            'i' => $movieId,
+            'apikey' => $this->apikey
+        ];
 
-        return json_decode($response->getBody()->getContents(), true);
-    }
+        try {
+            $response = $this->client->request('GET', '?' . http_build_query($data));
+        } catch (\Throwable $e) {
+            $this->logger->critical('Error "{error}" occurred while trying to search an movie', ['error' => $e->getMessage()]);
+        }       
+
+         return json_decode($response->getBody()->getContents(), true);
+    } 
 }
