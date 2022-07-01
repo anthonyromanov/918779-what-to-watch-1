@@ -1,0 +1,21 @@
+{
+    "name": "antonromanov/whatwatch",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+           "whatwatch\\": "app/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Anton Romanov",
+            "email": "609990@gmail.com"
+        }
+    ],
+    "require": {
+        "guzzlehttp/guzzle": "^7.4",
+        "psr/log": "^3.0",
+        "monolog/monolog": "^2.7",
+        "vlucas/phpdotenv": "^5.4"
+    }
+}
