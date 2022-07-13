@@ -17,3 +17,22 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::get('/user/{id}', [UserController::class, 'show']);
+Route::patch('/user/{id}', [UserController::class, 'update']);
+Route::get('/films', [FilmController::class, 'index']);
+Route::get('/films/{id}', [FilmController::class, 'show']);
+Route::post('/films', [FilmController::class, 'store']);
+Route::patch('/films/{id}', [FilmController::class, 'update']);
+Route::get('/genres', [GenreController::class, 'index']);
+Route::patch('/genres/{genre}', [GenreController::class, 'update']);
+Route::get('/favorite', [FavoriteController::class, 'index']);
+Route::post('films/{id}/favorite', [FavoriteController::class, 'store']);
+Route::delete('films/{id}/favorite', [FavoriteController::class, 'destroy']);
+Route::get('/films/{id}/comments', [CommentController::class, 'index']);
+Route::post('/films/{id}/comments', [CommentController::class, 'store']);
+Route::patch('/films/{id}/comments', [CommentController::class, 'update']);
+Route::delete('/films/{id}/comments', [CommentController::class, 'destroy']);
+Route::get('/films/{id}/similar', [SimilarController::class, 'index']);
+Route::get('/promo', [PromoController::class, 'show']);
+Route::post('/promo/{id}', [PromoController::class, 'store']);
