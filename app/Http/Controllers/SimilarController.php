@@ -11,9 +11,9 @@ class SimilarController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(): Success|Response
     {
-        //
+        return new Success();
     }
 
     /**
@@ -22,9 +22,9 @@ class SimilarController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request): Success|Response
     {
-        //
+        return new Success();
     }
 
     /**
@@ -33,9 +33,9 @@ class SimilarController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($id): Success|Response
     {
-        //
+        return new Success();
     }
 
     /**
@@ -45,9 +45,9 @@ class SimilarController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $id): Success|Response
     {
-        //
+        return new Success();
     }
 
     /**
@@ -56,8 +56,8 @@ class SimilarController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($id): Success|Response
     {
-        //
+        return new Success();
     }
 }
