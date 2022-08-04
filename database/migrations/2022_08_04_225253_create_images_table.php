@@ -13,10 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('stars', function (Blueprint $table) {
+        Schema::create('images', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 128)
-                ->nullable();
+            $table->string('poster_image', 500);
+            $table->string('preview_image', 500);
+            $table->foreignId('film_id')->constrained('films');
         });
     }
 
@@ -27,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('actors');
+        Schema::dropIfExists('images');
     }
 };

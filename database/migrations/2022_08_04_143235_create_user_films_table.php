@@ -13,21 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('user_films', function (Blueprint $table) {
-            $table->id();
-            $table->bigInteger('user_id')
-                ->unsigned();
-            $table->bigInteger('film_id')
-                ->unsigned();
-            $table->foreign('user_id')
-                ->references('id')
-                ->on('users')
-                ->onDelete('cascade');
-            $table->foreign('film_id')
-                ->references('id')
-                ->on('films')
-                ->onDelete('cascade');
-        });
+        Schema::dropIfExists('user_films');
     }
 
     /**

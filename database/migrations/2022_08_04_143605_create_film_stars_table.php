@@ -13,15 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('promo', function (Blueprint $table) {
+        Schema::create('film_stars', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
-            $table->bigInteger('film_id')
-                ->unsigned();
-            $table->foreign('film_id')
-                ->references('id')
-                ->on('films')
-                ->onDelete('cascade');
+            $table->foreignId('film_id')->unsigned()->constrained('films');
+            $table->foreignId('star_id')->unsigned()->constrained('stars');
         });
     }
 
@@ -32,6 +27,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('promo');
+        Schema::dropIfExists('film_stars');
     }
 };

@@ -13,10 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('favorites', function (Blueprint $table) {
+        Schema::create('stars', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->unsigned()->constrained('users');
-            $table->foreignId('film_id')->unsigned()->constrained('films');
+            $table->string('name', 128)->nullable();
         });
     }
 
@@ -27,6 +26,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('favorites');
+        Schema::dropIfExists('stars');
     }
 };
