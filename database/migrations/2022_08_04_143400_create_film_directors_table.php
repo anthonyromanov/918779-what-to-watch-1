@@ -13,16 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('film_directors', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 128)->nullable();
-            $table->string('email', 128)->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password', 128);
-            $table->rememberToken();
             $table->timestamps();
-            $table->string('avatar_url', 500);
-            $table->boolean('is_moderator');
         });
     }
 
@@ -33,6 +26,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('film_directors');
     }
 };
