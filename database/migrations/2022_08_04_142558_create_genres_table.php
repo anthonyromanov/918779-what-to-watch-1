@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('genres', function (Blueprint $table) {
             $table->id();
-            $table->string('title', 128)->nullable();
+            $table->string('title', 128);
         });
     }
 

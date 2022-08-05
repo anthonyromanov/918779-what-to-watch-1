@@ -20,11 +20,12 @@ return new class extends Migration
             $table->string('background_image', 500);
             $table->char('background_color', 7);
             $table->text('description');
-            $table->decimal('rating', 2, 1)->index('state');
+            $table->decimal('rating', 2, 1)->index('rating');
             $table->smallInteger('run_time');
-            $table->year('released')->index(['year', 'status']);
+            $table->year('released');
             $table->tinyInteger('status')->nullable();
-            $table->string('imdb_id', 25)->unque()->nullable();
+            $table->index(['released', 'status']);
+            $table->string('imdb_id', 25)->unique()->nullable();
         });
     }
 

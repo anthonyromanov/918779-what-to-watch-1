@@ -13,7 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::dropIfExists('user_films');
+        Schema::create('user_films', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->unsigned()->constrained('users');
+            $table->foreignId('film_id')->unsigned()->constrained('films');
+        });
     }
 
     /**
