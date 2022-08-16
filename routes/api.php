@@ -20,8 +20,8 @@ Route::post('/login', [\App\Http\Controllers\Api\LoginController::class, 'store'
 Route::middleware('auth:sanctum')->post('/logout',
     [\App\Http\Controllers\Api\LogoutController::class, 'logout']);
 
-Route::post([RegisterController::class, 'register'])->middleware('guest');
-Route::post([LoginController::class, 'login'])->middleware('guest');
+Route::post([\App\Http\Controllers\Api\RegisterController::class, 'register'])->middleware('guest');
+Route::post([\App\Http\Controllers\Api\LoginController::class, 'login'])->middleware('guest');
 
 Route::prefix('user')->middleware('auth:sanctum')->group(function () {
     Route::get('/', [\App\Http\Controllers\Api\UserController::class, 'show']);
