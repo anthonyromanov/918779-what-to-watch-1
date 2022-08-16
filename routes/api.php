@@ -14,9 +14,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::post('/register', [\App\Http\Controllers\Api\RegisterController::class, 'store']);
-Route::post('/login', [\App\Http\Controllers\Api\LoginController::class, 'store']);
-
 Route::middleware('auth:sanctum')->post('/logout',
     [\App\Http\Controllers\Api\LogoutController::class, 'logout']);
 
