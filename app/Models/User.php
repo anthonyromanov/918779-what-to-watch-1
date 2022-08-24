@@ -8,9 +8,19 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
+
+    public const ROLE_USER = 0;
+    public const ROLE_MODERATOR = 1;
+
+    protected $attributes = [
+        'is_moderator' => self::ROLE_USER,
+    ];
 
     /**
      * The attributes that are mass assignable.
@@ -45,5 +55,20 @@ class User extends Authenticatable
     public function films(): BelongsToMany
     {
         return $this->belongsToMany(Film::class);
+    }
+
+    public function comments(): HasMany
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+    public function favorites(): HasMany
+    {
+        return $this->hasMany(Favorite::class);
+    }
+
+    public function isModerator()
+    {
+        return $this->is_moderator === self::ROLE_MODERATOR;
     }
 }
