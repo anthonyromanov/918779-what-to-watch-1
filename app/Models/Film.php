@@ -13,6 +13,19 @@ class Film extends Model
 {
     use HasFactory;
 
+    public const FILM_PENDING = 0;
+    public const FILM_MODERATE = 1;
+    public const FILM_READY = 2;
+
+    /**
+     * Default film status.
+     *
+     * @var array
+     */
+    protected $attributes = [
+        'status' => self::FILM_PENDING,
+    ];
+
     public function favorite(): HasMany
     {
         return $this->hasMany(Favorite::class);
@@ -59,5 +72,15 @@ class Film extends Model
         $sum = $this->comments()->sum('rating');
 
         return $sum / $count;
+    }
+
+    public function isModerate()
+    {
+        return $this->status === self::FILM_MODERATE;
+    }
+
+    public function isReady()
+    {
+        return $this->status === self::FILM_READY;
     }
 }
