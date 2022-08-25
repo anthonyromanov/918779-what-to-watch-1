@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Comment extends Model
@@ -24,13 +23,9 @@ class Comment extends Model
         ]);
     }
 
-    public function userName()
+    public function userName(): string
     {
         $userName = $this->user()->name();
-
-        if ($userName === null) {
-            return 'Anonymous';
-        }
 
         return $userName;
     }

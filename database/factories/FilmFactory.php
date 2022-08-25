@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Film;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Enums\FilmStatus;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Film>
@@ -16,6 +17,9 @@ class FilmFactory extends Factory
      * @var string
      */
     protected $model = Film::class;
+    protected $attributes = [
+        'status' => FilmStatus::class,
+    ];
 
     /**
      * Define the model's default state.
@@ -36,7 +40,7 @@ class FilmFactory extends Factory
             'rating' => $this->faker->randomFloat(1, 1, 10),
             'run_time' => $this->faker->randomNumber(3, false),
             'released' => $this->faker->year(),
-            'status' => Film::FILM_PENDING,
+            'status' => FilmStatus::PENDING,
             'imdb_id' => $this->faker->word(),
         ];
     }
@@ -45,7 +49,7 @@ class FilmFactory extends Factory
     {
         return $this->state(function (array $attributes) {
             return [
-                'status' => Film::FILM_MODERATE,
+                'status' => FilmStatus::MODERATE,
             ];
         });
     }
@@ -54,7 +58,7 @@ class FilmFactory extends Factory
     {
         return $this->state(function (array $attributes) {
             return [
-                'status' => Film::FILM_READY,
+                'status' => FilmStatus::FILM_READY,
             ];
         });
     }

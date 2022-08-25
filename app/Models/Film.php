@@ -4,18 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use App\Enums\FilmStatus;
 
 class Film extends Model
 {
     use HasFactory;
-
-    public const FILM_PENDING = 0;
-    public const FILM_MODERATE = 1;
-    public const FILM_READY = 2;
 
     /**
      * Default film status.
@@ -23,7 +19,7 @@ class Film extends Model
      * @var array
      */
     protected $attributes = [
-        'status' => self::FILM_PENDING,
+        'status' => FilmStatus::class,
     ];
 
     public function favorite(): HasMany
@@ -66,7 +62,7 @@ class Film extends Model
         return $this->hasMany(Comment::class);
     }
 
-    public function getRating()
+    public function getRating(): float
     {
         $count = $this->comments()->count();
         $sum = $this->comments()->sum('rating');
@@ -74,13 +70,13 @@ class Film extends Model
         return $sum / $count;
     }
 
-    public function isModerate()
+    public function isModerate(): bool
     {
-        return $this->status === self::FILM_MODERATE;
+        return $this->status === FilmStatus::MODERATE;
     }
 
-    public function isReady()
+    public function isReady(): bool
     {
-        return $this->status === self::FILM_READY;
+        return $this->status === FilmStatus::READY;
     }
 }

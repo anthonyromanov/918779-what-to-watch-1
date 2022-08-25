@@ -7,19 +7,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Enums\UserRole;
 
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    public const ROLE_USER = 0;
-    public const ROLE_MODERATOR = 1;
-
     protected $attributes = [
-        'is_moderator' => self::ROLE_USER,
+        'is_moderator' => UserRole::class,
     ];
 
     /**
@@ -67,8 +64,8 @@ class User extends Authenticatable
         return $this->hasMany(Favorite::class);
     }
 
-    public function isModerator()
+    public function isModerator(): bool
     {
-        return $this->is_moderator === self::ROLE_MODERATOR;
+        return $this->is_moderator === UserRole::MODERATOR;
     }
 }

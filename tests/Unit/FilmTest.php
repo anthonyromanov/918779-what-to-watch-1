@@ -6,10 +6,15 @@ use App\Models\Comment;
 use App\Models\Film;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use App\Enums\FilmStatus;
 
 class FilmTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected $attributes = [
+        'status' => FilmStatus::class,
+    ];
 
     /**
      * Checking the calculation of the rating value, the user rating of the movie.
@@ -35,7 +40,7 @@ class FilmTest extends TestCase
     public function testStatusFilm()
     {
         $film = Film::factory()->create();
-        $this->assertTrue($film->status === Film::FILM_PENDING);
+        $this->assertTrue($film->status === FilmStatus::PENDING);
 
         $film = Film::factory()->filmOnModerate()->create();
         $this->assertTrue($film->isModerate());

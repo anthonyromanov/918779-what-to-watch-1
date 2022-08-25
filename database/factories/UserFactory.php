@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
+use App\Enums\UserRole;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
@@ -17,6 +18,9 @@ class UserFactory extends Factory
      * @var string
      */
     protected $model = User::class;
+    protected $attributes = [
+        'status' => UserRole::class,
+    ];
 
     /**
      * Define the model's default state.
@@ -53,11 +57,11 @@ class UserFactory extends Factory
      *
      * @return UserFactory
      */
-    public function moderator()
+    public function moderator(): UserFactory
     {
         return $this->state(function (array $attributes) {
             return [
-                'is_moderator' => User::ROLE_MODERATOR,
+                'is_moderator' => UserRole::MODERATOR,
             ];
         });
     }
