@@ -4,10 +4,23 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use App\Enums\FilmStatus;
 
 class Film extends Model
 {
     use HasFactory;
+
+    /**
+     * Default film status.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'status' => FilmStatus::class,
+    ];
 
     public function favorite(): HasMany
     {
@@ -42,5 +55,34 @@ class Film extends Model
     public function genres(): BelongsToMany
     {
         return $this->belongsToMany(Genre::class);
+    }
+
+    public function comments(): HasMany
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+    public function getRating(): float
+    {
+        $comments =  $this->comments();
+        $count = $comments->count();
+        $sum = $comments->sum('rating');
+
+        if ($count === 0)
+        {
+            return $count;
+        }
+
+        return round($sum / $count, 1);
+    }
+
+    public function isModerate(): bool
+    {
+        return $this->status === FilmStatus::MODERATE;
+    }
+
+    public function isReady(): bool
+    {
+        return $this->status === FilmStatus::READY;
     }
 }
