@@ -15,10 +15,6 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    protected $attributes = [
-        'is_moderator' => UserRole::class,
-    ];
-
     /**
      * The attributes that are mass assignable.
      *
@@ -47,8 +43,9 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'is_moderator' => UserRole::class,
     ];
-
+    
     public function films(): BelongsToMany
     {
         return $this->belongsToMany(Film::class);

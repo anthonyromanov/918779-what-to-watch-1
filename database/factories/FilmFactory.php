@@ -17,9 +17,6 @@ class FilmFactory extends Factory
      * @var string
      */
     protected $model = Film::class;
-    protected $attributes = [
-        'status' => FilmStatus::class,
-    ];
 
     /**
      * Define the model's default state.
@@ -30,17 +27,12 @@ class FilmFactory extends Factory
     {
         return [
             'name' => $this->faker->words(3, true),
-            'poster_image' => $this->faker->image(),
-            'preview_image' => $this->faker->image(),
             'background_image' => $this->faker->image(),
             'background_color' => $this->faker->hexColor(),
-            'video_link' => $this->faker->url(),
-            'preview_video_link' => $this->faker->url(),
             'description' => $this->faker->paragraph(),
             'rating' => $this->faker->randomFloat(1, 1, 10),
             'run_time' => $this->faker->randomNumber(3, false),
             'released' => $this->faker->year(),
-            'status' => FilmStatus::PENDING,
             'imdb_id' => $this->faker->word(),
         ];
     }
@@ -58,7 +50,7 @@ class FilmFactory extends Factory
     {
         return $this->state(function (array $attributes) {
             return [
-                'status' => FilmStatus::FILM_READY,
+                'status' => FilmStatus::READY,
             ];
         });
     }

@@ -2,9 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Comment;
-use App\Models\Film;
-use App\Models\User;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class UserSeeder extends Seeder
@@ -16,9 +14,6 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
-        User::factory()
-            ->count(5)
-            ->has(Film::factory()->has(Comment::factory()))
-            ->create();
+        //
     }
 }

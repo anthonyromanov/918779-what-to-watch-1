@@ -12,10 +12,6 @@ class FilmTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected $attributes = [
-        'status' => FilmStatus::class,
-    ];
-
     /**
      * Checking the calculation of the rating value, the user rating of the movie.
      *
@@ -25,11 +21,23 @@ class FilmTest extends TestCase
     {
         $film = Film::factory()->create();
 
-        Comment::factory()->for($film)->create(['rating' => 8]);
-        Comment::factory()->for($film)->create(['rating' => 5]);
         Comment::factory()->for($film)->create(['rating' => 6]);
 
-        $this->assertEquals(6.3, $film->getRating());
+        $this->assertEquals(6, $film->getRating());
+    }
+
+        /**
+     * Checking the calculation of the zero rating value, the user rating of the movie.
+     *
+     * @return void
+     */
+    public function testGetZeroFilmRating()
+    {
+        $film = Film::factory()->create();
+
+        Comment::factory()->for($film)->create(['rating' => 0]);
+
+        $this->assertEquals(0, $film->getRating());
     }
 
     /**
@@ -39,9 +47,6 @@ class FilmTest extends TestCase
      */
     public function testStatusFilm()
     {
-        $film = Film::factory()->create();
-        $this->assertTrue($film->status === FilmStatus::PENDING);
-
         $film = Film::factory()->filmOnModerate()->create();
         $this->assertTrue($film->isModerate());
 

@@ -18,7 +18,7 @@ class Film extends Model
      *
      * @var array
      */
-    protected $attributes = [
+    protected $casts = [
         'status' => FilmStatus::class,
     ];
 
@@ -64,10 +64,16 @@ class Film extends Model
 
     public function getRating(): float
     {
-        $count = $this->comments()->count();
-        $sum = $this->comments()->sum('rating');
+        $comments =  $this->comments();
+        $count = $comments->count();
+        $sum = $comments->sum('rating');
 
-        return $sum / $count;
+        if ($count === 0)
+        {
+            return $count;
+        }
+
+        return round($sum / $count, 1);
     }
 
     public function isModerate(): bool

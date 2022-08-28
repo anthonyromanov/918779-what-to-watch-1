@@ -21,8 +21,8 @@ return new class extends Migration
             $table->string('password', 128);
             $table->rememberToken();
             $table->timestamps();
-            $table->string('avatar_url', 500);
-            $table->boolean('is_moderator');
+            $table->string('avatar_url', 500)->nullable();
+            $table->boolean('is_moderator')->default(0);
         });
     }
 
