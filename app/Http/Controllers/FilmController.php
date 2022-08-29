@@ -63,19 +63,4 @@ class FilmController extends Controller
     {
         //
     }
-
-    public function similar($id)
-    {
-
-    }
-
-    public function getPromo()
-    {
-
-    }
-
-    public function setPromo()
-    {
-
-    }
 }

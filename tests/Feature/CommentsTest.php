@@ -40,74 +40,72 @@ class CommentsTest extends TestCase
     }
 
     public function testAddComment()
-{
-    Sanctum::actingAs(User::factory()->create());
-    $film = Film::factory()->create();
-    $comment = Comment::factory()->create();
+    {
+        Sanctum::actingAs(User::factory()->create());
+        $film = Film::factory()->create();
+        $comment = Comment::factory()->create();
 
-    $newComment = Comment::factory()->make();
+        $newComment = Comment::factory()->make();
 
-    $response = $this->postJson(route('comments.store', [
-        'film' => $film,
-        'comment' => $film->comments()->first()
-    ]), ['text' => $newComment->text]);
+        $response = $this->postJson(route('comments.store', [
+            'film' => $film,
+            'comment' => $film->comments()->first()
+        ]), ['text' => $newComment->text]);
 
-    $response->assertStatus(201);
-}
+        $response->assertStatus(201);
+    }
 
-public function testValidationErrorForAddComment()
-{
-    Sanctum::actingAs(User::factory()->create());
-    $film = Film::factory()->create();
-    $comment = Comment::factory()->create();
+    public function testValidationErrorForAddComment()
+    {
+        Sanctum::actingAs(User::factory()->create());
+        $film = Film::factory()->create();
+        $comment = Comment::factory()->create();
 
-    $response = $this->postJson(route('comments.store', [
-        'film' => $film,
-        'comment' => $film->comments()->first()
-    ]));
+        $response = $this->postJson(route('comments.store', [
+            'film' => $film,
+            'comment' => $film->comments()->first()
+        ]));
 
-    $response->assertStatus(422);
-    $response->assertJsonStructure(['errors' => ['text']]);
-}
+        $response->assertStatus(422);
+        $response->assertJsonStructure(['errors' => ['text']]);
+    }
 
-public function testAuthErrorForAddComment()
-{
-    $user = User::factory()->create();
-    $film = Film::factory()->create();
-    $comment = Comment::factory()->create();
+    public function testAuthErrorForAddComment()
+    {
+        $user = User::factory()->create();
+        $film = Film::factory()->create();
+        $comment = Comment::factory()->create();
 
-    $newComment = Comment::factory()->make();
+        $newComment = Comment::factory()->make();
 
-    $response = $this->postJson(route('comments.store', [
-        'film' => $film,
-        'comment' => $film->comments()->first()
-    ]), ['text' => $newComment->text]);
+        $response = $this->postJson(route('comments.store', [
+            'film' => $film,
+            'comment' => $film->comments()->first()
+        ]), ['text' => $newComment->text]);
 
-    $response->assertStatus(401);
-    $response->assertJsonFragment(['message' => 'Unauthenticated.']);
-}
+        $response->assertStatus(401);
+        $response->assertJsonFragment(['message' => 'Unauthenticated.']);
+    }
 
-public function testDeleteComment()
-{
-    Sanctum::actingAs(User::factory()->moderator()->create());
-    $film = Film::factory()->create();
-    $comment = Comment::factory()->create();
+    public function testDeleteComment()
+    {
+        Sanctum::actingAs(User::factory()->moderator()->create());
+        $film = Film::factory()->create();
+        $comment = Comment::factory()->create();
 
-    $response = $this->deleteJson(route('comments.destroy', $comment->id));
+        $response = $this->deleteJson(route('comments.destroy', $comment->id));
 
-    $response->assertStatus(201);
-}
+        $response->assertStatus(201);
+    }
 
-public function testDeleteCommentByGuest()
-{
-    Sanctum::actingAs(User::factory()->create());
-    $film = Film::factory()->create();
-    $comment = Comment::factory()->create();
+    public function testDeleteCommentByGuest()
+    {
+        Sanctum::actingAs(User::factory()->create());
+        $film = Film::factory()->create();
+        $comment = Comment::factory()->create();
 
-    $response = $this->deleteJson(route('comments.destroy', $comment->id));
+        $response = $this->deleteJson(route('comments.destroy', $comment->id));
 
-    $response->assertStatus(403);
-}
-
-
+        $response->assertStatus(403);
+    }
 }

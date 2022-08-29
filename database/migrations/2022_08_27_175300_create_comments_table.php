@@ -15,12 +15,13 @@ return new class extends Migration
     {
         Schema::create('comments', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
             $table->string('text', 400);
             $table->tinyInteger('rating')->nullable();
-            $table->unsignedBigInteger('comment_id')->constrained('comments')->nullable();
+            $table->unsignedBigInteger('comment_id')->constrained('comments');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('film_id')->constrained('films')->onDelete('cascade');
+            $table->timestamp('created_at')->nullable(); 
+            $table->timestamp('updated_at')->nullable();
         });
     }
 

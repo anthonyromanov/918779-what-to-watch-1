@@ -15,9 +15,10 @@ class CommentController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param Film $film
      * @return JsonResponse|Responsable
      */
-    public function index(Film $film)
+    public function index(Film $film): Response
     {
         return $this->success([
             'count' => $film->comments_count,
@@ -32,7 +33,7 @@ class CommentController extends Controller
      * @param Film $film
      * @return JsonResponse|Responsable
      */
-    public function store(CommentRequest $request, Film $film)
+    public function store(CommentRequest $request, Film $film): Response
     {
         $film->comments()->create([
             'comment_id' => $request->comment,
