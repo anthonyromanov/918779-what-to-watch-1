@@ -10,6 +10,10 @@ class Comment extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'comment_id',
+    ];
+
     public function film(): BelongsTo
     {
         return $this->belongsTo(Film::class);

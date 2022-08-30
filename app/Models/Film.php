@@ -22,6 +22,18 @@ class Film extends Model
         'status' => FilmStatus::class,
     ];
 
+    protected $withCount = ['comments'];
+
+    protected $fillable = [
+        'name',
+        'background_image',
+        'background_color',
+        'description',
+        'run_time',
+        'released',
+        'imdb_id',
+    ];
+
     public function favorite(): HasMany
     {
         return $this->hasMany(Favorite::class);

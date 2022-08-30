@@ -4,7 +4,7 @@ namespace App\Http\Responses;
 
 use Symfony\Component\HttpFoundation\Response;
 
-class FailValidation extends Base
+class Success extends Base
 {
     public int $statusCode = Response::HTTP_OK;
 
@@ -13,8 +13,10 @@ class FailValidation extends Base
      *
      * @return array
      */
-    protected function makeResponseData(): array
+    protected function makeResponseData(): ?array
     {
-        return $this->prepareData();
+        return $this-> data ? [
+            'data' => $this-> prepareData()
+        ] : null;
     }
 }

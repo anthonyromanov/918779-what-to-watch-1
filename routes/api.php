@@ -15,53 +15,54 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware('auth:sanctum')->post('/logout',
-    [\App\Http\Controllers\Api\LogoutController::class, 'logout']);
+    [\App\Http\Controllers\LogoutController::class, 'logout']);
 
-Route::post([\App\Http\Controllers\Api\RegisterController::class, 'register'])->middleware('guest');
-Route::post([\App\Http\Controllers\Api\LoginController::class, 'login'])->middleware('guest');
+Route::post('/register', [\App\Http\Controllers\RegisterController::class, 'register'])->middleware('guest');
+Route::post('/login', [\App\Http\Controllers\LoginController::class, 'login'])->middleware('guest');
 
 Route::prefix('user')->middleware('auth:sanctum')->group(function () {
-    Route::get('/', [\App\Http\Controllers\Api\UserController::class, 'show']);
-    Route::patch('/', [\App\Http\Controllers\Api\UserController::class, 'update']);
+    Route::get('/', [\App\Http\Controllers\UserController::class, 'show']);
+    Route::patch('/', [\App\Http\Controllers\UserController::class, 'update']);
 });
 
 Route::group(['prefix' => 'films'], function () {
-    Route::get('/', [\App\Http\Controllers\Api\FilmController::class, 'index']);                      // Все пользователи
-    Route::patch('/{id}', [\App\Http\Controllers\Api\FilmController::class, 'show']);                 // Все пользователи
-    Route::get('/{id}/similar', [\App\Http\Controllers\Api\FilmController::class, 'getSimilar'])      // Все пользователи
+    Route::get('/', [\App\Http\Controllers\FilmController::class, 'index'])->name('films.index');                      // Все пользователи
+    Route::get('/{film}', [\App\Http\Controllers\FilmController::class, 'show'])->name('films.show');                // Все пользователи
+    Route::get('/{id}/similar', [\App\Http\Controllers\FilmController::class, 'getSimilar'])                           // Все пользователи
     ->where('id', '\d+');
-    Route::get('/{id}/comments', [\App\Http\Controllers\Api\CommentController::class, 'show'])        // Все пользователи
+    Route::get('/{film}/comments', [\App\Http\Controllers\CommentController::class, 'index'])->name('comments.index');
+    Route::get('/{id}/comments', [\App\Http\Controllers\CommentController::class, 'show'])                             // Все пользователи
     ->where('id', '\d+');
 });
 
 Route::prefix('films')->middleware('auth:sanctum')->group(function () {
-    Route::post('/', [\App\Http\Controllers\Api\FilmController::class, 'store']);                     // Модератор
-    Route::patch('/{id}', [\App\Http\Controllers\Api\FilmController::class, 'update'])                // Модератор
+    Route::post('/', [\App\Http\Controllers\FilmController::class, 'store']);                     // Модератор
+    Route::patch('/{id}', [\App\Http\Controllers\FilmController::class, 'update'])                // Модератор
         ->where('id', '\d+');
-    Route::post('/{id}/favorite', [\App\Http\Controllers\Api\FavoriteController::class, 'store'])
+    Route::post('/{id}/favorite', [\App\Http\Controllers\FavoriteController::class, 'store'])
         ->where('id', '\d+');
-    Route::delete('/{id}/favorite', [\App\Http\Controllers\Api\FavoriteController::class, 'destroy'])
+    Route::delete('/{id}/favorite', [\App\Http\Controllers\FavoriteController::class, 'destroy'])
         ->where('id', '\d+');
 
-    Route::post('/{id}/comments', [\App\Http\Controllers\Api\CommentController::class, 'store'])
+    Route::post('/{film}/comments/{comment?}', [\App\Http\Controllers\CommentController::class, 'store'])->name('comments.store')
         ->where('id', '\d+');
 });
 
-Route::get('genres/', [\App\Http\Controllers\Api\GenreController::class, 'index']);                   // Все пользователи
+Route::get('genres/', [\App\Http\Controllers\GenreController::class, 'index'])->name('genres.index');                   // Все пользователи
 
 Route::prefix('genres')->middleware('auth:sanctum')->group(function () {
-    Route::patch('/{genre}', [\App\Http\Controllers\Api\GenreController::class, 'update']);           // Модератор
+    Route::patch('/{genre}', [\App\Http\Controllers\GenreController::class, 'update'])->name('genres.update');           // Модератор
 });
 
-Route::middleware('auth:sanctum')->get('/favorite', [\App\Http\Controllers\Api\FavoriteController::class, 'index']);
+Route::middleware('auth:sanctum')->get('/favorite', [\App\Http\Controllers\FavoriteController::class, 'index']);
 
 Route::prefix('comments')->middleware('auth:sanctum')->group(function () {
-    Route::patch('/{comment}', [\App\Http\Controllers\Api\CommentController::class, 'update']);
-    Route::delete('/{comment}', [\App\Http\Controllers\Api\CommentController::class, 'destroy']);
+    Route::patch('/{comment}', [\App\Http\Controllers\CommentController::class, 'update']);
+    Route::delete('/{comment}', [\App\Http\Controllers\CommentController::class, 'destroy'])->middleware('can:moderator')->name('comments.destroy');
 });
 
 Route::prefix('promo')->middleware('auth:sanctum')->group(function () {
-    Route::get('/', [\App\Http\Controllers\Api\PromoController::class, 'index']);
-    Route::post('/{id}', [\App\Http\Controllers\Api\PromoController::class, 'store'])                // Модератор
+    Route::get('/', [\App\Http\Controllers\PromoController::class, 'index']);
+    Route::post('/{id}', [\App\Http\Controllers\PromoController::class, 'store'])                // Модератор
         ->where('id', '\d+');
 });

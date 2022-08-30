@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Film;
+use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class FilmController extends Controller
@@ -9,11 +12,11 @@ class FilmController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return  JsonResponse|Responsable
      */
-    public function index(): Success|Response
+    public function index()
     {
-        return new Success();
+        return $this->paginate(Film::select(['id', 'name'])->paginate(8));
     }
 
     /**
@@ -22,9 +25,9 @@ class FilmController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request): Success|Response
+    public function store(Request $request)
     {
-        return new Success();
+        //
     }
 
     /**
@@ -33,9 +36,9 @@ class FilmController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id): Success|Response
+    public function show(Film $film)
     {
-        return new Success();
+        return $this->success($film);
     }
 
     /**
@@ -45,9 +48,9 @@ class FilmController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id): Success|Response
+    public function update(Request $request, $id)
     {
-        return new Success();
+        //
     }
 
     /**
@@ -56,8 +59,8 @@ class FilmController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id): Success|Response
+    public function destroy($id)
     {
-        return new Success();
+        //
     }
 }

@@ -2,18 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\GenreRequest;
+use App\Models\Genre;
 use Illuminate\Http\Request;
+use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Http\JsonResponse;
 
 class GenreController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse|Responsable
      */
-    public function index(): Success|Response
+    public function index()
     {
-        return new Success();
+        return $this->success(Genre::all());
     }
 
     /**
@@ -22,9 +26,9 @@ class GenreController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request): Success|Response
+    public function store(Request $request)
     {
-        return new Success();
+        //
     }
 
     /**
@@ -33,21 +37,16 @@ class GenreController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id): Success|Response
+    public function show($id)
     {
-        return new Success();
+        //
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id): Success|Response
+    public function update(GenreRequest $request, Genre $genre): \App\Http\Responses\Success
     {
-        return new Success();
+        $genre->update($request->validated());
+
+        return $this->success($genre->fresh());
     }
 
     /**
@@ -56,8 +55,8 @@ class GenreController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id): Success|Response
+    public function destroy($id)
     {
-        return new Success();
+        //
     }
 }
