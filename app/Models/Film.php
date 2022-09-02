@@ -32,6 +32,7 @@ class Film extends Model
         'run_time',
         'released',
         'imdb_id',
+        'status',
     ];
 
     public function favorite(): HasMany

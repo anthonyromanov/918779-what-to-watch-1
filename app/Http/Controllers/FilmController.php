@@ -25,9 +25,12 @@ class FilmController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(AddFilmRequest $request)
     {
-        //
+        AddFilm::dispatch($request->imdb);
+
+        return $this->success(null, 201);
+
     }
 
     /**
