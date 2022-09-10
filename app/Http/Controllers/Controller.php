@@ -12,16 +12,12 @@ use Symfony\Component\HttpFoundation\Response;
 
 class Controller extends BaseController
 {
-    use AuthorizesRequests;
-    use DispatchesJobs;
-    use ValidatesRequests;
-
-    protected function success($data, ?int $code = Response::HTTP_OK)
+    protected function success($data, ?int $code = Response::HTTP_OK): Success
     {
         return new Success($data, $code);
     }
 
-    protected function paginate($data, ?int $code = Response::HTTP_OK)
+    protected function paginate($data, ?int $code = Response::HTTP_OK): Pagination
     {
         return new Pagination($data, $code);
     }

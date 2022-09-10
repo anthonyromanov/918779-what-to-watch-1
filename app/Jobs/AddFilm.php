@@ -6,21 +6,17 @@ use App\Models\Actor;
 use App\Models\Director;
 use App\Models\Film;
 use App\Models\Genre;
-use App\Services\MovieInfoGetter;
-use App\Services\OmdRepository;
+use App\Enums\FilmStatus;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\DB;
 
 class AddFilm implements ShouldQueue
 {
-    use Dispatchable;
-    use InteractsWithQueue;
-    use Queueable;
-    use SerializesModels;
 
     protected $imdbId;
     /**
@@ -38,49 +34,49 @@ class AddFilm implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(MovieFinder $movies): void
     {
-        $movieRepository = new OmdRepository($this->imdbId);
-        $movieInfoGetter = new MovieInfoGetter();
-        $info = $movieInfoGetter->getArrayInfo($movieRepository);
-        $data = $info[0];
 
-        if ($data) {
-            list('Genre' => $genres, 'Director' => $directors, 'Actors' => $actors, 'Released' => $released) = $data;
-            $genres = explode(", ", $genres);
-            $directors = explode(", ", $directors);
-            $actors = explode(", ", $actors);
-            $yearReleased = date("Y", strtotime($released));
+        $movie = $movies->find($this->imdbId);
 
-            $genresId = [];
-            $directorsId = [];
-            $actorsId = [];
+        if (!$movie) {
+            return;
+        }
 
-            foreach ($genres as $genre) {
-                $genresId = Genre::firstOrCreate(['name' => $genre])->id;
-            }
+        $genres = $movie['Genre'];
+        $directors = $movie['Director'];
+        $stars = $movie['Actors'];
+        $poster = $movie['Poster'];
 
-            foreach ($directors as $director) {
-                $directorsId = Director::firstOrCreate(['name' => $director])->id;
-            }
+        foreach ($genres as $genre) {
+            $genresId = Genre::firstOrCreate(['title' => $genre])->id;
+        }
 
-            foreach ($actors as $actor) {
-                $actorsId = Actor::firstOrCreate(['name' => $actor])->id;
-            }
+        foreach ($directors as $director) {
+            $directorsId = Director::firstOrCreate(['name' => $director])->id;
+        }
+
+        foreach ($stars as $star) {
+            $actorsId = Star::firstOrCreate(['name' => $star])->id;
+        }
+
+        DB::transaction(function ()
+        {
 
             $film = Film::create([
-                'name' => $data['Title'],
-                'poster_image' => $data['Poster'],
-                'description' => $data['Plot'],
-                'run_time' => intval($data['Runtime']),
-                'released' => $yearReleased,
-                'imdb_id' => $data['imdbID'],
-                'status' => 'pending',
+                'name' => $movie['Title'],
+                'description' => $movie['Plot'],
+                'run_time' => intval($movie['Runtime']),
+                'released' => date("Y", strtotime($movie['Released'])),
+                'imdb_id' => $movie['imdbID'],
+                'status' => FilmStatus::PENDING,
             ]);
 
             $film->genres()->attach($genresId);
             $film->directors()->attach($directorsId);
-            $film->actors()->attach($actorsId);
-        }
+            $film->stars()->attach($actorsId);
+            $film->image()->attach($imageId);
+
+        });
     }
 }

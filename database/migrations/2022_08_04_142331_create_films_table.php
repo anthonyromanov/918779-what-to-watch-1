@@ -24,7 +24,7 @@ return new class extends Migration
             $table->decimal('rating', 2, 1)->index('rating');
             $table->smallInteger('run_time')->nullable();
             $table->year('released')->nullable();
-            $table->set('status', ['pending', 'on moderation, ready'])->nullable();
+            $table->set('status', ['pending', 'on moderation', 'ready'])->nullable();
             $table->index(['released', 'status']);
             $table->string('imdb_id', 25)->unique()->nullable();
             $table->string('video_link', 500)->constrained('videos');

@@ -3,10 +3,13 @@
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use GuzzleHttp\Client;
+
 use App\Services\OmdbRepository;
+use App\Services\GetMovies;
+
 use App\Services\MovieFinder;
 
-require_once '../vendor/autoload.php';
+require_once '../../vendor/autoload.php';
 
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();

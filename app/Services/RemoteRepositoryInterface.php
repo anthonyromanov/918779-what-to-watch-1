@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-interface RemoteRepository
+interface RemoteRepositoryInterface
 {
     public function getMovie(string $movieId): array;
 }
