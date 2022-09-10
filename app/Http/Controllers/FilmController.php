@@ -12,6 +12,10 @@ use Illuminate\Contracts\Bus\Dispatcher;
 class FilmController extends Controller
 {
 
+    public function __construct(private readonly Dispatcher $dispatcher)
+    {
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -28,10 +32,10 @@ class FilmController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(AddFilmRequest $request)
+    public function store(AddFilmRequest $request): JsonResponse
     {
 
-        dispatch(new App\Jobs\AddFilm, $request->imdb);
+        $this->dispatcher->dispatch(new AddFilm($request->imdb));
 
         return $this->success(null, 201);
     }
