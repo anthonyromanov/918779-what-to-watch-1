@@ -10,6 +10,10 @@ class Star extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'name',
+    ];
+
     public function films(): BelongsToMany
     {
         return $this->belongsToMany(Film::class);

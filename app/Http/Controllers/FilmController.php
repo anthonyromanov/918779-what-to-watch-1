@@ -6,9 +6,16 @@ use App\Models\Film;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Bus;
+use Illuminate\Contracts\Bus\Dispatcher;
 
 class FilmController extends Controller
 {
+
+    public function __construct(private readonly Dispatcher $dispatcher)
+    {
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -25,9 +32,12 @@ class FilmController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(AddFilmRequest $request): JsonResponse
     {
-        //
+
+        $this->dispatcher->dispatch(new AddFilm($request->imdb));
+
+        return $this->success(null, 201);
     }
 
     /**

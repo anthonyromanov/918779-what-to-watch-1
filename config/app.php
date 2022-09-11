@@ -58,6 +58,21 @@ return [
 
     'asset_url' => env('ASSET_URL'),
 
+
+        /*
+    |--------------------------------------------------------------------------
+    | External Service DATA
+    |--------------------------------------------------------------------------
+    |
+    | External service address. For example, OMDB.
+    | The key of access to the information of the external service.
+    |
+    */
+
+    'external_service_key' => env('EXTERNAL_SERVICE_KEY', '579fed43'),
+
+    'external_service_url' => env('EXTERNAL_SERVICE_URL', 'http://www.omdbapi.com'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone
@@ -182,6 +197,7 @@ return [
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
 
+
         /*
          * Package Service Providers...
          */
@@ -194,6 +210,11 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+
+        //Custom Service Providers...
+        App\Providers\AddFilmsServiceProvider::class,
+        App\Providers\MovieFinderServiceProvider::class,
+
 
     ],
 
