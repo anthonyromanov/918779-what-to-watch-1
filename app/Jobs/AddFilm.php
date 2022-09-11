@@ -46,18 +46,27 @@ class AddFilm implements ShouldQueue
         $genres = $movie['Genre'];
         $directors = $movie['Director'];
         $stars = $movie['Actors'];
-        $poster = $movie['Poster'];
+        $images = $movie['Poster'];
+
+        $genresId = [];
+        $directorsId = [];
+        $starsId = [];
+        $imageId = [];
 
         foreach ($genres as $genre) {
-            $genresId = Genre::firstOrCreate(['title' => $genre])->id;
+            $genresId[] .= Genre::firstOrCreate(['title' => $genre])->id;
         }
 
         foreach ($directors as $director) {
-            $directorsId = Director::firstOrCreate(['name' => $director])->id;
+            $directorsId[] .= Director::firstOrCreate(['name' => $director])->id;
         }
 
         foreach ($stars as $star) {
-            $actorsId = Star::firstOrCreate(['name' => $star])->id;
+            $starsId[] .= Star::firstOrCreate(['name' => $star])->id;
+        }
+
+        foreach ($images as $image) {
+            $imageId[] .= Star::firstOrCreate(['poster_image' => $image])->id;
         }
 
         DB::transaction(function ()
