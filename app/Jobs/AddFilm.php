@@ -54,22 +54,22 @@ class AddFilm implements ShouldQueue
         $imageId = [];
 
         foreach ($genres as $genre) {
-            $genresId[] .= Genre::firstOrCreate(['title' => $genre])->id;
+            $genresId[] = Genre::firstOrCreate(['title' => $genre])->id;
         }
 
         foreach ($directors as $director) {
-            $directorsId[] .= Director::firstOrCreate(['name' => $director])->id;
+            $directorsId[] = Director::firstOrCreate(['name' => $director])->id;
         }
 
         foreach ($stars as $star) {
-            $starsId[] .= Star::firstOrCreate(['name' => $star])->id;
+            $starsId[] = Star::firstOrCreate(['name' => $star])->id;
         }
 
         foreach ($images as $image) {
-            $imageId[] .= Star::firstOrCreate(['poster_image' => $image])->id;
+            $imageId[] = Star::firstOrCreate(['poster_image' => $image])->id;
         }
 
-        DB::transaction(function ()
+        DB::transaction(function () use ($genresId, $directorsId, $starsId, $imageId)
         {
 
             $film = Film::create([
@@ -83,7 +83,7 @@ class AddFilm implements ShouldQueue
 
             $film->genres()->attach($genresId);
             $film->directors()->attach($directorsId);
-            $film->stars()->attach($actorsId);
+            $film->stars()->attach($starsId);
             $film->image()->attach($imageId);
 
         });
