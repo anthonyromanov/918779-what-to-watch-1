@@ -2,62 +2,41 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Responses\Base;
+use App\Http\Responses\Success;
+use App\Models\Film;
+use Symfony\Component\HttpFoundation\Response;
 
 class SimilarController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Получение списка фильмов, похожих на данный.
      *
-     * @return \Illuminate\Http\Response
+     * @param Film $film.
+     * @return Base
      */
-    public function index(): Success|Response
+    public function index(Film $film): Base
     {
-        return new Success();
-    }
+        $status = Film::STATUS_READY;
+        $similarFilmsCount = 4;
+        $filmGenres = $film->genres->pluck('id');
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request): Success|Response
-    {
-        return new Success();
-    }
+        $similarFilms = Film::where('status', $status)
+            ->where('id', '!=', $film->id)
+            ->whereHas('genres', function ($query) use ($filmGenres) {
+                $query->whereIn('genres.id', $filmGenres);
+            })
+            ->withCount(['genres as genres_count' => function ($query) use ($filmGenres) {
+                $query->whereIn('genres.id', $filmGenres);
+            }])
+            ->orderByDesc('genres_count')
+            ->limit($similarFilmsCount)
+            ->get();
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id): Success|Response
-    {
-        return new Success();
-    }
+        if ($similarFilms->isEmpty()) {
+            return new Success(null, Response::HTTP_NO_CONTENT);
+        }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id): Success|Response
-    {
-        return new Success();
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id): Success|Response
-    {
-        return new Success();
+        return new Success($similarFilms);
     }
 }

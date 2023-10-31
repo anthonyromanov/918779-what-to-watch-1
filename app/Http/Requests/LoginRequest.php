@@ -7,9 +7,9 @@ use Illuminate\Foundation\Http\FormRequest;
 class LoginRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Определяет, авторизован ли пользователь для выполнения запроса.
      *
-     * @return bool
+     * @return bool Разрешение на выполнение запроса.
      */
     public function authorize()
     {
@@ -17,9 +17,9 @@ class LoginRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * Возвращает правила валидации для запроса.
      *
-     * @return array<string, mixed>
+     * @return array Правила валидации.
      */
     public function rules()
     {

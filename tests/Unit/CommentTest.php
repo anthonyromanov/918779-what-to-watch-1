@@ -2,8 +2,8 @@
 
 namespace Tests\Unit;
 
-use App\Models\Comment;
 use App\Models\User;
+use App\Models\Comment;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -12,32 +12,27 @@ class CommentTest extends TestCase
     use RefreshDatabase;
 
     /**
-     * Test for obtaining the name of a registered user.
-     *
-     * @return void
+     * Тестирование получения имени автора комментария.
      */
-    public function testGetUserName()
+    public function testRegisterAuthorName(): void
     {
-        $user = User::factory()->create();
-        $comment = Comment::factory()->for($user)->create();
-        $name = $user->name;
-        $userName = $comment->user->name;
+        $user = User::factory()->create(['name' => 'Райан Рейнольдс']);
+        $comment = Comment::factory()->for($user, 'user')->create(['is_external' => false]);
 
-        $this->assertEquals($name, $userName);
+        $authorName = $comment->author_name;
+
+        $this->assertEquals('Райан Рейнольдс', $authorName);
     }
 
     /**
-     * Anonymous User Test.
-     *
-     * @return void
+     * Тестирование получения имени анонимного автора комментария.
      */
-    public function testGetAnonymous()
+    public function testAnonymousAuthorName(): void
     {
-        $user = User::factory()->create();
-        $comment = Comment::factory()->for($user)->create();
-        $user->delete();
-        $userName = $comment->user->name;
+        $comment = Comment::factory()->create(['is_external' => true]);
 
-        $this->assertEquals('Anonymous', $userName);
+        $authorName = $comment->author_name;
+
+        $this->assertEquals(Comment::ANONYMOUS_NAME, $authorName);
     }
 }

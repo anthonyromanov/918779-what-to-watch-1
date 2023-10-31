@@ -2,34 +2,34 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\UserRequest;
+use App\Http\Requests\RegisterRequest;
+use App\Http\Responses\Base;
 use App\Http\Responses\Success;
 use App\Models\User;
-use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Hash;
 
 class RegisterController extends Controller
 {
     /**
-     * Registers a new user.
+     * Выполняет регистрацию пользователя в сервисе.
      *
-     * @param UserRequest $request
-     * @return Success|Response
-     * @api {post} /api/register
-     *
+     * @param RegisterRequest $request.
+     * @return Base
      */
-
-    public function store(UserRequest $request): Success|Response
+    public function register(RegisterRequest $request): Base
     {
-        $params = $request->safe()->except('file');
-        $user = User::create($params);
-        $token = $user->createToken('auth-token');
+        $data = $request->validated();
 
-        return new Success([
-            'user' => $user,
-            'token' => $token->plainTextToken,
-        ], 201);
+        if ($request->hasFile('avatar')) {
+            $avatar = $request->file('avatar');
+            $filename = $avatar->store('public/avatars', 'local');
+            $data['avatar'] = $filename;
+        }
+
+        $data['password'] = Hash::make($data['password']);
+        $user = User::create($data);
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return new Success(['user' => $user, 'token' => $token]);
     }
-
-
 }

@@ -1,5 +1,14 @@
 <?php
 
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CommentController;
+use App\Http\Controllers\FavoriteController;
+use App\Http\Controllers\FilmController;
+use App\Http\Controllers\GenreController;
+use App\Http\Controllers\PromoController;
+use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\SimilarController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -9,60 +18,58 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 |
 | Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group. Enjoy building your API!
+| routes are loaded by the RouteServiceProvider and all of them will
+| be assigned to the "api" middleware group. Make something great!
 |
 */
 
-Route::middleware('auth:sanctum')->post('/logout',
-    [\App\Http\Controllers\LogoutController::class, 'logout']);
-
-Route::post('/register', [\App\Http\Controllers\RegisterController::class, 'register'])->middleware('guest');
-Route::post('/login', [\App\Http\Controllers\LoginController::class, 'login'])->middleware('guest');
-
-Route::prefix('user')->middleware('auth:sanctum')->group(function () {
-    Route::get('/', [\App\Http\Controllers\UserController::class, 'show']);
-    Route::patch('/', [\App\Http\Controllers\UserController::class, 'update']);
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    return $request->user();
 });
 
-Route::group(['prefix' => 'films'], function () {
-    Route::get('/', [\App\Http\Controllers\FilmController::class, 'index'])->name('films.index');                      // Все пользователи
-    Route::get('/{film}', [\App\Http\Controllers\FilmController::class, 'show'])->name('films.show');                // Все пользователи
-    Route::get('/{id}/similar', [\App\Http\Controllers\FilmController::class, 'getSimilar'])                           // Все пользователи
-    ->where('id', '\d+');
-    Route::get('/{film}/comments', [\App\Http\Controllers\CommentController::class, 'index'])->name('comments.index');
-    Route::get('/{id}/comments', [\App\Http\Controllers\CommentController::class, 'show'])                             // Все пользователи
-    ->where('id', '\d+');
+/* Регистрация */
+Route::post('/register', [RegisterController::class, 'register']);
+
+/* Авторизация */
+Route::post('/login', [AuthController::class, 'login']);
+Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
+
+/* Пользователь */
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/user', [UserController::class, 'show']);
+    Route::patch('/user', [UserController::class, 'update']);
 });
 
-Route::prefix('films')->middleware('auth:sanctum')->group(function () {
-    Route::post('/', [\App\Http\Controllers\FilmController::class, 'store'])->name('films.store');                     // Модератор
-    Route::patch('/{id}', [\App\Http\Controllers\FilmController::class, 'update'])                // Модератор
-        ->where('id', '\d+');
-    Route::post('/{id}/favorite', [\App\Http\Controllers\FavoriteController::class, 'store'])
-        ->where('id', '\d+');
-    Route::delete('/{id}/favorite', [\App\Http\Controllers\FavoriteController::class, 'destroy'])
-        ->where('id', '\d+');
-
-    Route::post('/{film}/comments/{comment?}', [\App\Http\Controllers\CommentController::class, 'store'])->name('comments.store')
-        ->where('id', '\d+');
+/* Фильмы */
+Route::get('/films', [FilmController::class, 'index']);
+Route::get('/films/{film}', [FilmController::class, 'show']);
+Route::middleware(['auth:sanctum', 'moderator'])->group(function () {
+    Route::post('/films', [FilmController::class, 'store']);
+    Route::patch('/films/{film}', [FilmController::class, 'update']);
 });
 
-Route::get('genres/', [\App\Http\Controllers\GenreController::class, 'index'])->name('genres.index');                   // Все пользователи
+/* Жанры */
+Route::get('/genres', [GenreController::class, 'index']);
+Route::middleware(['auth:sanctum', 'moderator'])->patch('/genres/{genre}', [GenreController::class, 'update']);
 
-Route::prefix('genres')->middleware('auth:sanctum')->group(function () {
-    Route::patch('/{genre}', [\App\Http\Controllers\GenreController::class, 'update'])->name('genres.update');           // Модератор
+/* Избранное */
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/favorite', [FavoriteController::class, 'index']);
+    Route::post('/films/{film}/favorite/', [FavoriteController::class, 'store']);
+    Route::delete('/films/{film}/favorite/', [FavoriteController::class, 'destroy']);
 });
 
-Route::middleware('auth:sanctum')->get('/favorite', [\App\Http\Controllers\FavoriteController::class, 'index']);
+/* Похожие фильмы */
+Route::get('/films/{film}/similar', [SimilarController::class, 'index']);
 
-Route::prefix('comments')->middleware('auth:sanctum')->group(function () {
-    Route::patch('/{comment}', [\App\Http\Controllers\CommentController::class, 'update']);
-    Route::delete('/{comment}', [\App\Http\Controllers\CommentController::class, 'destroy'])->middleware('can:moderator')->name('comments.destroy');
+/* Комментарии */
+Route::get('/films/{film}/comments', [CommentController::class, 'index']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/films/{film}/comments', [CommentController::class, 'store']);
+    Route::patch('/comments/{comment}', [CommentController::class, 'update']);
+    Route::delete('/comments/{comment}', [CommentController::class, 'destroy']);
 });
 
-Route::prefix('promo')->middleware('auth:sanctum')->group(function () {
-    Route::get('/', [\App\Http\Controllers\PromoController::class, 'index']);
-    Route::post('/{id}', [\App\Http\Controllers\PromoController::class, 'store'])                // Модератор
-        ->where('id', '\d+');
-});
+/* Промо */
+Route::get('/promo', [PromoController::class, 'index']);
+Route::middleware(['auth:sanctum', 'moderator'])->post('/promo/{film}', [PromoController::class, 'store']);

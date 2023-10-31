@@ -2,62 +2,33 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Responses\Base;
+use App\Http\Responses\Success;
+use App\Models\Film;
+use App\Models\Promo;
 use Illuminate\Http\Request;
 
 class PromoController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Получение текущего промо ролика.
      *
-     * @return \Illuminate\Http\Response
+     * @return Base
      */
-    public function index(): Success|Response
+    public function index(): Base
     {
-        return new Success();
+        $promo = Promo::latest()->first();
+        return new Success($promo);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Установка нового промо ролика.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return Base
      */
-    public function store(Request $request): Success|Response
+    public function store(Request $request, Film $film): Base
     {
-        return new Success();
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id): Success|Response
-    {
-        return new Success();
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id): Success|Response
-    {
-        return new Success();
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id): Success|Response
-    {
-        return new Success();
+        $promo = Promo::create(['film_id' => $film->id]);
+        return new Success($promo);
     }
 }

@@ -3,30 +3,52 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Auth;
 
 class GenreRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Определяет, авторизован ли пользователь для выполнения запроса.
      *
-     * @return bool
+     * @return bool Разрешение на выполнение запроса.
      */
-    public function authorize()
+    public function authorize(): bool
     {
-        return Auth::check() && Auth::user()->isModerator();
+        return true;
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * Возвращает атрибуты для сообщений об ошибках валидации.
      *
-     * @return array
+     * @return array Атрибуты для сообщений об ошибках.
      */
-    public function rules()
+    public function attributes(): array
     {
         return [
-            'title' => 'required|string'
+            'name' => 'Название',
         ];
     }
 
+    /**
+     * Возвращает правила валидации для запроса.
+     *
+     * @return array Правила валидации.
+     */
+    public function rules(): array
+    {
+        return [
+            'name' => 'required|string|min:1|max:255',
+        ];
+    }
+
+    /**
+     * Возвращает пользовательские сообщения об ошибках валидации.
+     *
+     * @return array Сообщения об ошибках.
+     */
+    public function messages(): array
+    {
+        return [
+            'name.required' => 'Поле Название обязательно для заполнения.',
+        ];
+    }
 }

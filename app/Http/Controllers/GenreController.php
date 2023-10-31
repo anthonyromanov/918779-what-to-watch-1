@@ -3,60 +3,33 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\GenreRequest;
+use App\Http\Responses\Base;
+use App\Http\Responses\Success;
 use App\Models\Genre;
-use Illuminate\Http\Request;
-use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Http\JsonResponse;
 
 class GenreController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Получение списка жанров.
      *
-     * @return JsonResponse|Responsable
+     * @return Base
      */
-    public function index()
+    public function index(): Base
     {
-        return $this->success(Genre::all());
+        $genres = Genre::all();
+        return new Success($genres);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Редактирование жанра.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return Base
      */
-    public function store(Request $request)
+    public function update(GenreRequest $request, Genre $genre): Base
     {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    public function update(GenreRequest $request, Genre $genre): \App\Http\Responses\Success
-    {
-        $genre->update($request->validated());
-
-        return $this->success($genre->fresh());
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
+        $genre->update([
+            'name' => $request->input('name'),
+        ]);
+        return new Success($genre);
     }
 }

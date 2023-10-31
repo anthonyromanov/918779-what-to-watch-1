@@ -2,21 +2,17 @@
 
 namespace App\Http\Responses;
 
-use Symfony\Component\HttpFoundation\Response;
-
 class Success extends Base
 {
-    public int $statusCode = Response::HTTP_OK;
-
     /**
-     * Формирование содежимого ответа.
+     * Формирование содержимого успешного ответа.
      *
-     * @return array
+     * @return array|null
      */
     protected function makeResponseData(): ?array
     {
-        return $this-> data ? [
-            'data' => $this-> prepareData()
-        ] : null;
+        return [
+            'data' => $this->prepareData(),
+        ];
     }
 }

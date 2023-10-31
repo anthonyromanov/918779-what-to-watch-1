@@ -2,55 +2,37 @@
 
 namespace Tests\Unit;
 
-use App\Models\Comment;
+use App\Models\User;
 use App\Models\Film;
+use App\Models\Comment;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use App\Enums\FilmStatus;
 
 class FilmTest extends TestCase
 {
     use RefreshDatabase;
 
     /**
-     * Checking the calculation of the rating value, the user rating of the movie.
-     *
-     * @return void
+     * Тестирование метода calculateRating() класса Film.
      */
-    public function testGetFilmRating()
+    public function testFilmRating(): void
     {
+        $usersCount = 3;
+
         $film = Film::factory()->create();
+        $users = User::factory()->count($usersCount)->create();
 
-        Comment::factory()->for($film)->create(['rating' => 6]);
+        foreach ($users as $index => $user) {
+            Comment::factory()->create([
+                'film_id' => $film->id,
+                'user_id' => $user->id,
+            ]);
+        }
+        $film->calculateRating();
 
-        $this->assertEquals(6, $film->getRating());
-    }
+        $averageRating = $film->comments()->avg('rating');
+        $averageRating = $averageRating ? round($averageRating, 1) : 0;
 
-        /**
-     * Checking the calculation of the zero rating value, the user rating of the movie.
-     *
-     * @return void
-     */
-    public function testGetZeroFilmRating()
-    {
-        $film = Film::factory()->create();
-
-        Comment::factory()->for($film)->create(['rating' => 0]);
-
-        $this->assertEquals(0, $film->getRating());
-    }
-
-    /**
-     * Checks the status of the film.
-     *
-     * @return void
-     */
-    public function testStatusFilm()
-    {
-        $film = Film::factory()->filmOnModerate()->create();
-        $this->assertTrue($film->isModerate());
-
-        $film = Film::factory()->filmIsReady()->create();
-        $this->assertTrue($film->isReady());
+        $this->assertEquals($averageRating, $film->rating);
     }
 }

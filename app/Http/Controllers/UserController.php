@@ -2,62 +2,63 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\UpdateUserRequest;
+use App\Http\Responses\Base;
+use App\Http\Responses\Success;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Получение данных о пользователе.
      *
-     * @return \Illuminate\Http\Response
+     * @return Base
      */
-    public function index(): Success|Response
+    public function show(): Base
     {
-        return new Success();
+        $user = Auth::user();
+        return new Success([
+            'user' => $user,
+        ]);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Обновление данных о пользователе.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return Base
      */
-    public function store(Request $request): Success|Response
+    public function update(UpdateUserRequest $request): Base
     {
-        return new Success();
-    }
+        /** @var User|null $user */
+        $user = Auth::user();
+        $data = [
+            'email' => $request->input('email'),
+            'name' => $request->input('name'),
+        ];
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id): Success|Response
-    {
-        return new Success();
-    }
+        if ($request->has('password')) {
+            $data['password'] = Hash::make($request->input('password'));
+        }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id): Success|Response
-    {
-        return new Success();
-    }
+        $oldAvatar = null;
+        if ($request->hasFile('avatar')) {
+            $newAvatar = $request->file('avatar');
+            $oldAvatar = $user->avatar;
+            $filename = $newAvatar->store('public/avatars', 'local');
+            $data['avatar'] = $filename;
+        }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id): Success|Response
-    {
-        return new Success();
+        $user->update($data);
+
+        if ($oldAvatar) {
+            Storage::delete($oldAvatar);
+        }
+
+        return new Success([
+            'user' => $user,
+        ]);
     }
 }

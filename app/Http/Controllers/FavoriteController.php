@@ -2,62 +2,65 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Responses\Base;
+use App\Http\Responses\Fail;
+use App\Http\Responses\Success;
+use App\Models\Film;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\Response;
 
 class FavoriteController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Получение списка избранных фильмов.
      *
-     * @return \Illuminate\Http\Response
+     * @return Base
      */
-    public function index(): Success|Response
+    public function index(): Base
     {
+        /** @var User $user */
+        $user = Auth::user();
+        $favoriteFilms = $user->favoriteFilms()->orderBy('created_at', 'desc')->get();
+
+        return new Success($favoriteFilms);
+    }
+
+    /**
+     * Добавление фильма в избранное.
+     *
+     * @return Base
+     */
+    public function store(Film $film): Base
+    {
+        /** @var User $user */
+        $user = Auth::user();
+
+        if ($user->hasFavorite($film->id)) {
+            return new Fail('Фильм уже в избранном', Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        $user->favoriteFilms()->attach($film);
+
         return new Success();
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Удаление фильма из избранного.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return Base
      */
-    public function store(Request $request): Success|Response
+    public function destroy(Film $film): Base
     {
-        return new Success();
-    }
+        /** @var User $user */
+        $user = Auth::user();
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id): Success|Response
-    {
-        return new Success();
-    }
+        if (!$user->hasFavorite($film->id)) {
+            return new Fail('Фильм не найден в избранном', Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id): Success|Response
-    {
-        return new Success();
-    }
+        $user->favoriteFilms()->detach($film);
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id): Success|Response
-    {
         return new Success();
     }
 }

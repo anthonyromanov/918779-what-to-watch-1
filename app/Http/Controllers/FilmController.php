@@ -2,75 +2,101 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\FilmRequest;
+use App\Http\Requests\StoreFilmRequest;
+use App\Http\Requests\UpdateFilmRequest;
+use App\Http\Responses\Base;
+use App\Http\Responses\Fail;
+use App\Http\Responses\SuccessPagination;
+use App\Http\Responses\Success;
+use App\Jobs\CreateFilmJob;
 use App\Models\Film;
-use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Bus;
-use Illuminate\Contracts\Bus\Dispatcher;
+use App\Services\ActorService;
+use App\Services\GenreService;
+use Illuminate\Support\Facades\Gate;
+use Symfony\Component\HttpFoundation\Response;
 
 class FilmController extends Controller
 {
-
-    public function __construct(private readonly Dispatcher $dispatcher)
+    /**
+     * Получение списка фильмов.
+     *
+     * @return Base
+     */
+    public function index(FilmRequest $request): Base
     {
+        $pageCount = config('custom.films_per_page');
+        $page = $request->query('page');
+        $genre = $request->query('genre');
+        $status = $request->query('status', Film::STATUS_READY);
+        $order_by = $request->query('order_by', Film::ORDER_BY_RELEASED);
+        $order_to = $request->query('order_to', Film::ORDER_TO_DESC);
+
+        if (Gate::denies('view-films-with-status', $status)) {
+            return new Fail("Недостаточно прав для просмотра фильмов в статусе $status", Response::HTTP_FORBIDDEN);
+        }
+
+        $films = Film::query()
+            ->select('id', 'name', 'preview_image', 'released', 'rating')
+            ->when($genre, function ($query, $genre) {
+                return $query->whereRelation('genres', 'name', $genre);
+            })
+            ->when($status, function ($query, $status) {
+                return $query->where('status', $status);
+            })
+            ->orderBy($order_by, $order_to)
+            ->paginate($pageCount);
+
+        return new SuccessPagination($films);
     }
 
     /**
-     * Display a listing of the resource.
+     * Добавление фильма в базу данных.
      *
-     * @return  JsonResponse|Responsable
+     * @return Base
      */
-    public function index()
+    public function store(StoreFilmRequest $request)
     {
-        return $this->paginate(Film::select(['id', 'name'])->paginate(8));
+        $imdbId = $request->input('imdb_id');
+
+        $data = [
+            'imdb_id' => $imdbId,
+            'status' => Film::STATUS_PENDING,
+        ];
+
+        Film::create($data);
+        CreateFilmJob::dispatch($data);
+
+        return new Success($data, Response::HTTP_CREATED);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Получение информации о фильме.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return Base
      */
-    public function store(AddFilmRequest $request): JsonResponse
+    public function show(Film $film): Base
     {
-
-        $this->dispatcher->dispatch(new AddFilm($request->imdb));
-
-        return $this->success(null, 201);
+        return new Success($film);
     }
 
     /**
-     * Display the specified resource.
+     * Редактирование фильма.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Base
      */
-    public function show(Film $film)
+    public function update(UpdateFilmRequest $request, Film $film): Base
     {
-        return $this->success($film);
-    }
+        $film->update($request->validated());
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
+        if ($request->has('starring')) {
+            app(ActorService::class)->syncStars($film, $request->input('starring'));
+        }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
+        if ($request->has('genre')) {
+            app(GenreService::class)->syncGenres($film, $request->input('genre'));
+        }
+
+        return new Success($film);
     }
 }

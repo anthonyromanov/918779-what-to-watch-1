@@ -3,75 +3,91 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CommentRequest;
+use App\Http\Responses\Base;
+use App\Http\Responses\Fail;
+use App\Http\Responses\Success;
 use App\Models\Comment;
 use App\Models\Film;
-use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Http\JsonResponse;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
+use Symfony\Component\HttpFoundation\Response;
 
 class CommentController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Получение отзывов к фильму.
      *
-     * @param Film $film
-     * @return JsonResponse|Responsable
+     * @return Base
      */
-    public function index(Film $film): Response
+    public function index(Film $film): Base
     {
-        return $this->success([
-            'count' => $film->comments_count,
-            'comments' => $film->comments,
+        $comments = $film->comments()->get();
+        return new Success($comments);
+    }
+
+    /**
+     * Добавление отзыва к фильму.
+     *
+     * @return Base
+     */
+    public function store(CommentRequest $request, Film $film): Base
+    {
+        /** @var User|null $user */
+        $user = Auth::user();
+
+        $comment = $film->comments()->create([
+            'comment_id' => $request->get('comment_id', null),
+            'text' => $request->input('text'),
+            'rating' => $request->input('rating'),
+            'user_id' => $user->id,
         ]);
+
+        $film->calculateRating();
+
+        return new Success($comment);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Редактирование отзыва к фильму.
      *
-     * @param CommentRequest $request
-     * @param Film $film
-     * @return JsonResponse|Responsable
+     * @return Base
      */
-    public function store(CommentRequest $request, Film $film): Response
+    public function update(CommentRequest $request, Comment $comment): Base
     {
-        $film->comments()->create([
-            'comment_id' => $request->comment,
-            'text' => $request->text,
-            'user_id' => Auth::id(),
+        if (Gate::denies('comment-edit', $comment)) {
+            return new Fail('Недостаточно прав.', Response::HTTP_FORBIDDEN);
+        }
+
+        $comment->update([
+            'text' => $request->input('text'),
+            'rating' => $request->input('rating'),
         ]);
 
-        return $this->success(null, 201);
+        $film = $comment->film;
+        $film->calculateRating();
+
+        return new Success($comment);
     }
 
     /**
-     * Display the specified resource.
+     * Удаление отзыва к фильму.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Base
      */
-    public function show($id)
+    public function destroy(Request $request, Comment $comment): Base
     {
-        //
-    }
+        if (Gate::denies('comment-delete', $comment)) {
+            return new Fail('Недостаточно прав.', Response::HTTP_FORBIDDEN);
+        }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param Request $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-
-    public function destroy(Comment $comment)
-    {
+        $comment->children()->delete();
         $comment->delete();
 
-        return $this->success(null, 201);
+        $film = $comment->film;
+        $film->calculateRating();
+
+        return new Success(null, Response::HTTP_NO_CONTENT);
     }
 }

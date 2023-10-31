@@ -10,12 +10,22 @@ class Genre extends Model
 {
     use HasFactory;
 
+    /**
+     * Атрибуты, которые можно массово присваивать.
+     *
+     * @var array<string>
+     */
     protected $fillable = [
-        'title',
+        'name',
     ];
 
-    public function films(): BelongsToMany
+    /**
+     * Показывает фильмы, которым присвоен жанр
+     *
+     * @return BelongsToMany
+     */
+    public function films():BelongsToMany
     {
-        return $this->belongsToMany(Film::class);
+        return $this->belongsToMany(Film::class, 'film_genre', 'genre_id', 'film_id');
     }
 }

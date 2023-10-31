@@ -7,9 +7,9 @@ use Illuminate\Foundation\Http\FormRequest;
 class CommentRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Определяет, авторизован ли пользователь для выполнения запроса.
      *
-     * @return bool
+     * @return bool Разрешение на выполнение запроса.
      */
     public function authorize()
     {
@@ -17,20 +17,16 @@ class CommentRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * Возвращает правила валидации для запроса.
      *
-     * @return array
+     * @return array Правила валидации.
      */
-    public function rules()
+    public function rules(): array
     {
         return [
-            'text' => 'required',
-            'comment' => 'nullable|exists:comments,id'
+            'text' => 'required|string|min:50|max:400',
+            'rating' => 'required|integer|min:1|max:10',
+            'comment_id' => 'nullable|exists:comments,id',
         ];
-    }
-
-    protected function prepareForValidation()
-    {
-        $this->merge(['comment' => $this->route('comment')]);
     }
 }
